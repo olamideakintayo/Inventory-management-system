@@ -7,6 +7,6 @@ public class ProductResponse {
     private Long productId;
     private String name;
     private String description;
-    private Integer reorderThreshold;
+    private Integer reOrderThreshold;
     private Integer quantityInStock;
 }

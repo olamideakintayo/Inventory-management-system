@@ -6,6 +6,6 @@ import lombok.Data;
 public class ProductRequest {
     private String name;
     private String description;
-    private Integer reorderThreshold;
+    private Integer reOrderThreshold;
     private Integer quantityInStock;
 }
