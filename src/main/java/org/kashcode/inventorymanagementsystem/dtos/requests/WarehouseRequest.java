@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class WarehouseRequest {
     private String name;
-    private String location;
+    private String address;
     private Integer capacity;
 }

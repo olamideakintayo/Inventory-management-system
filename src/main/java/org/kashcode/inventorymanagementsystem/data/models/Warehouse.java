@@ -24,5 +24,5 @@ public class Warehouse {
     private String address;
 
     @Column(nullable = false)
-    private String capacity;
+    private Integer capacity;
 }

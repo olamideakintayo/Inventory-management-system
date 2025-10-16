@@ -6,6 +6,6 @@ import lombok.Data;
 public class WarehouseResponse {
     private Long warehouseId;
     private String name;
-    private String location;
+    private String address;
     private Integer capacity;
 }

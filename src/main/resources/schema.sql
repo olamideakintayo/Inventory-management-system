@@ -22,7 +22,7 @@ CREATE TABLE suppliers (
 CREATE TABLE warehouses (
                             warehouse_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                             name VARCHAR(255) NOT NULL,
-                            location VARCHAR(255) NOT NULL,
+                            location BIGINT NOT NULL,
                             capacity INT NOT NULL
 );
 
