@@ -4,7 +4,7 @@ import org.kashcode.inventorymanagementsystem.data.models.PurchaseOrder;
 import org.kashcode.inventorymanagementsystem.dtos.responses.PurchaseOrderResponse;
 
 public class PurchaseOrderMapper {
-    public PurchaseOrderResponse toPurchaseOrderResponse(PurchaseOrder order) {
+    public static PurchaseOrderResponse toPurchaseOrderResponse(PurchaseOrder order) {
         PurchaseOrderResponse response = new PurchaseOrderResponse();
         response.setOrderId(order.getPurchaseOrderId());
         response.setProductName(order.getProduct().getName());
