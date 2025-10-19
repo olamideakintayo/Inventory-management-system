@@ -12,17 +12,19 @@ import org.kashcode.inventorymanagementsystem.data.repositories.PurchaseOrderRep
 import org.kashcode.inventorymanagementsystem.data.repositories.SupplierRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
 import org.kashcode.inventorymanagementsystem.dtos.responses.ProductResponse;
-import org.kashcode.inventorymanagementsystem.utils.ProductMapper;
+import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
+import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +56,7 @@ class ProductServiceImplTest {
         product.setReOrderThreshold(5);
     }
 
-        @Test
+    @Test
     void getAllProducts_ShouldReturnMappedResponses_WhenProductsExist() {
         when(productRepository.findAll()).thenReturn(List.of(product));
 
@@ -64,7 +66,6 @@ class ProductServiceImplTest {
         assertThat(responses.get(0).getName()).isEqualTo(product.getName());
         verify(productRepository, times(1)).findAll();
     }
-
 
     @Test
     void getAllProducts_ShouldReturnEmptyList_WhenNoProductsExist() {
@@ -87,7 +88,6 @@ class ProductServiceImplTest {
         verify(productRepository, times(1)).save(product);
     }
 
-
     @Test
     void checkAndReorder_ShouldCreatePurchaseOrder_WhenStockBelowThresholdAndDependenciesExist() {
         Supplier supplier = new Supplier();
@@ -101,38 +101,37 @@ class ProductServiceImplTest {
         verify(purchaseOrderRepository, times(1)).save(any(PurchaseOrder.class));
     }
 
+    @Test
+    void checkAndReorder_ShouldThrowSupplierNotFoundException_WhenNoSupplierExists() {
+        when(supplierRepository.findAll()).thenReturn(List.of());
+        lenient().when(warehouseRepository.findAll()).thenReturn(List.of(new Warehouse()));
+
+        assertThatThrownBy(() -> productService.checkAndReorder(product))
+                .isInstanceOf(SupplierNotFoundException.class)
+                .hasMessage("Supplier not found");
+
+        verify(purchaseOrderRepository, never()).save(any());
+    }
+
+    @Test
+    void checkAndReorder_ShouldThrowWarehouseNotFoundException_WhenNoWarehouseExists() {
+        when(supplierRepository.findAll()).thenReturn(List.of(new Supplier()));
+        when(warehouseRepository.findAll()).thenReturn(List.of());
+
+        assertThatThrownBy(() -> productService.checkAndReorder(product))
+                .isInstanceOf(WarehouseNotFoundException.class)
+                .hasMessage("Warehouse not found");
+
+        verify(purchaseOrderRepository, never()).save(any());
+    }
 
     @Test
     void checkAndReorder_ShouldNotCreateOrder_WhenStockAboveThreshold() {
         product.setQuantityInStock(10);
-
         productService.checkAndReorder(product);
 
-        verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
+        verify(purchaseOrderRepository, never()).save(any());
     }
-
-
-    @Test
-    void checkAndReorder_ShouldNotCreateOrder_WhenSupplierMissing() {
-        when(supplierRepository.findAll()).thenReturn(List.of());
-        when(warehouseRepository.findAll()).thenReturn(List.of(new Warehouse()));
-
-        productService.checkAndReorder(product);
-
-        verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
-    }
-
-
-    @Test
-    void checkAndReorder_ShouldNotCreateOrder_WhenWarehouseMissing() {
-        when(supplierRepository.findAll()).thenReturn(List.of(new Supplier()));
-        when(warehouseRepository.findAll()).thenReturn(List.of());
-
-        productService.checkAndReorder(product);
-
-        verify(purchaseOrderRepository, never()).save(any(PurchaseOrder.class));
-    }
-
 
     @Test
     void updateStock_ShouldUpdateProductAndTriggerReorder_WhenProductExists() {
@@ -143,9 +142,7 @@ class ProductServiceImplTest {
         when(supplierRepository.findAll()).thenReturn(List.of(supplier));
         when(warehouseRepository.findAll()).thenReturn(List.of(warehouse));
 
-
         productService.updateStock(1L, 2);
-
 
         verify(productRepository, times(1)).save(product);
         verify(purchaseOrderRepository, times(1)).save(argThat(order ->
@@ -154,10 +151,7 @@ class ProductServiceImplTest {
                         order.getWarehouse() == warehouse &&
                         order.getQuantityOrdered() == product.getReOrderThreshold() * 2
         ));
-
-
     }
-
 
     @Test
     void updateStock_ShouldDoNothing_WhenProductNotFound() {

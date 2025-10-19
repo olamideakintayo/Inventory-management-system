@@ -9,6 +9,8 @@ import org.kashcode.inventorymanagementsystem.data.repositories.ProductRepositor
 import org.kashcode.inventorymanagementsystem.data.repositories.PurchaseOrderRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.SupplierRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
+import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
+import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
 import org.kashcode.inventorymanagementsystem.utils.ProductMapper;
 import org.springframework.stereotype.Service;
 
@@ -49,9 +51,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void checkAndReorder(Product product) {
         if (product.getQuantityInStock() < product.getReOrderThreshold()) {
-            Supplier supplier = supplierRepository.findAll().stream().findFirst().orElse(null);
-            Warehouse warehouse = warehouseRepository.findAll().stream().findFirst().orElse(null);
+            Supplier supplier = supplierRepository.findAll().stream().findFirst().orElseThrow(() -> new SupplierNotFoundException("Supplier not found"));
 
+            Warehouse warehouse = warehouseRepository.findAll().stream().findFirst().orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
             if (supplier != null && warehouse != null) {
                 PurchaseOrder order = new PurchaseOrder();
                 order.setProduct(product);
