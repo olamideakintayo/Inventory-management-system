@@ -5,7 +5,7 @@ import org.kashcode.inventorymanagementsystem.dtos.requests.ProductRequest;
 import org.kashcode.inventorymanagementsystem.dtos.responses.ProductResponse;
 
 public class ProductMapper {
-    public Product toProductEntity(ProductRequest request) {
+    public static Product toProductEntity(ProductRequest request) {
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -14,7 +14,7 @@ public class ProductMapper {
         return product;
     }
 
-    public ProductResponse toProductResponse(Product product) {
+    public static ProductResponse toProductResponse(Product product) {
         ProductResponse response = new ProductResponse();
         response.setProductId(product.getProductId());
         response.setName(product.getName());
