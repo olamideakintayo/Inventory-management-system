@@ -1,5 +1,6 @@
 package org.kashcode.inventorymanagementsystem.services;
 
+import org.kashcode.inventorymanagementsystem.dtos.requests.ProductRequest;
 import org.kashcode.inventorymanagementsystem.dtos.responses.ProductResponse;
 import org.kashcode.inventorymanagementsystem.data.models.Product;
 import org.kashcode.inventorymanagementsystem.data.models.PurchaseOrder;
@@ -44,9 +45,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse createProduct(Product product) {
-        return ProductMapper.toProductResponse(productRepository.save(product));
+    public ProductResponse createProduct(ProductRequest request) {
+        Product product = ProductMapper.toProductEntity(request);
+        Product savedProduct = productRepository.save(product);
+        return ProductMapper.toProductResponse(savedProduct);
     }
+
 
     @Override
     public void checkAndReorder(Product product) {

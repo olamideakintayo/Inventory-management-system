@@ -7,6 +7,10 @@
 //import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
 //import org.kashcode.inventorymanagementsystem.dtos.requests.PurchaseOrderRequest;
 //import org.kashcode.inventorymanagementsystem.dtos.responses.PurchaseOrderResponse;
+//import org.kashcode.inventorymanagementsystem.exceptions.ProductNotFoundException;
+//import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
+//import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
+//import org.kashcode.inventorymanagementsystem.utils.PurchaseOrderMapper;
 //
 //import java.util.List;
 //
@@ -30,11 +34,11 @@
 //    @Override
 //    public PurchaseOrderResponse createOrder(PurchaseOrderRequest request) {
 //        Product product = productRepository.findById(request.getProductId())
-//                .orElseThrow(() -> new RuntimeException("Product not found"));
+//                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 //        Supplier supplier = supplierRepository.findById(request.getSupplierId())
-//                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+//                .orElseThrow(() -> new SupplierNotFoundException("Supplier not found"));
 //        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId())
-//                .orElseThrow(() -> new RuntimeException("Warehouse not found"));
+//                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
 //
 //        validateWarehouseCapacity(warehouse, request.getQuantityOrdered());
 //
@@ -48,7 +52,7 @@
 //
 //        orderRepository.save(order);
 //
-//        return mapper.toPurchaseOrderResponse(order);
+//        return PurchaseOrderMapper.toPurchaseOrderResponse(order);
 //    }
 //
 //    @Override

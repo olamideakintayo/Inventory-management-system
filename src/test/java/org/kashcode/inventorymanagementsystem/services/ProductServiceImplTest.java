@@ -11,6 +11,7 @@ import org.kashcode.inventorymanagementsystem.data.repositories.ProductRepositor
 import org.kashcode.inventorymanagementsystem.data.repositories.PurchaseOrderRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.SupplierRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
+import org.kashcode.inventorymanagementsystem.dtos.requests.ProductRequest;
 import org.kashcode.inventorymanagementsystem.dtos.responses.ProductResponse;
 import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
 import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
@@ -79,13 +80,19 @@ class ProductServiceImplTest {
 
     @Test
     void createProduct_ShouldReturnMappedResponse_WhenProductIsSaved() {
+        var productRequest = new ProductRequest();
+        productRequest.setName("Laptop");
+        productRequest.setDescription("High-end laptop");
+        productRequest.setQuantityInStock(3);
+        productRequest.setReOrderThreshold(5);
+
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
-        ProductResponse response = productService.createProduct(product);
+        ProductResponse response = productService.createProduct(productRequest);
 
         assertThat(response).isNotNull();
         assertThat(response.getName()).isEqualTo("Laptop");
-        verify(productRepository, times(1)).save(product);
+        verify(productRepository, times(1)).save(any(Product.class));
     }
 
     @Test
