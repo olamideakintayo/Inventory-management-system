@@ -33,10 +33,10 @@ CREATE TABLE warehouses (
 CREATE TABLE products (
                           product_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                           name VARCHAR(255) NOT NULL,
-                          description TEXT,
-                          reorder_threshold INT NOT NULL,
+                          description TEXT NOT NULL,
+                          re_order_threshold INT NOT NULL,
                           quantity_in_stock INT NOT NULL,
-                          warehouse_id BIGINT,  -- each product belongs to one warehouse
+                          warehouse_id BIGINT,
 
                           CONSTRAINT fk_product_warehouse FOREIGN KEY (warehouse_id)
                               REFERENCES warehouses (warehouse_id)
