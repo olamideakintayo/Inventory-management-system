@@ -29,6 +29,10 @@ public class Product {
     @Column(nullable = false)
     private Integer quantityInStock;
 
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id")
+    private Warehouse warehouse;
+
 
 }
 

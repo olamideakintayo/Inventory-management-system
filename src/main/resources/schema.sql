@@ -2,6 +2,7 @@
 -- DATABASE SCHEMA: Inventory Management System
 -- ================================================
 
+-- Drop in correct dependency order to avoid constraint conflicts
 DROP TABLE IF EXISTS purchase_orders;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS suppliers;
@@ -22,7 +23,7 @@ CREATE TABLE suppliers (
 CREATE TABLE warehouses (
                             warehouse_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                             name VARCHAR(255) NOT NULL,
-                            location BIGINT NOT NULL,
+                            location VARCHAR(255) NOT NULL,
                             capacity INT NOT NULL
 );
 
@@ -34,7 +35,12 @@ CREATE TABLE products (
                           name VARCHAR(255) NOT NULL,
                           description TEXT,
                           reorder_threshold INT NOT NULL,
-                          quantity_in_stock INT NOT NULL
+                          quantity_in_stock INT NOT NULL,
+                          warehouse_id BIGINT,  -- each product belongs to one warehouse
+
+                          CONSTRAINT fk_product_warehouse FOREIGN KEY (warehouse_id)
+                              REFERENCES warehouses (warehouse_id)
+                              ON DELETE SET NULL
 );
 
 -- ================================================

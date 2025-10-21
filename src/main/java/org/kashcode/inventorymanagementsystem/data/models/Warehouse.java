@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Entity
 @Table(name = "warehouses")
@@ -25,4 +27,7 @@ public class Warehouse {
 
     @Column(nullable = false)
     private Integer capacity;
+
+    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products;
 }
