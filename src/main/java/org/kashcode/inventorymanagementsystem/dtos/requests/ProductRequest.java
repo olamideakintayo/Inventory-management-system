@@ -8,4 +8,5 @@ public class ProductRequest {
     private String description;
     private Integer reOrderThreshold;
     private Integer quantityInStock;
+    private Long warehouseId;
 }

@@ -46,7 +46,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
+        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId())
+                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
+
         Product product = ProductMapper.toProductEntity(request);
+        product.setWarehouse(warehouse);
+
         Product savedProduct = productRepository.save(product);
         return ProductMapper.toProductResponse(savedProduct);
     }
