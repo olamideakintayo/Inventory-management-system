@@ -15,10 +15,12 @@ import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundExcepti
 import org.kashcode.inventorymanagementsystem.exceptions.WarehouseCapacityExceededException;
 import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
 import org.kashcode.inventorymanagementsystem.utils.PurchaseOrderMapper;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Service
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     private final PurchaseOrderRepository purchaseOrderRepository;
