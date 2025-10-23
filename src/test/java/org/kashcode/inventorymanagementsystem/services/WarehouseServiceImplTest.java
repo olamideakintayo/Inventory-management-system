@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.kashcode.inventorymanagementsystem.data.models.Warehouse;
 import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
 import org.kashcode.inventorymanagementsystem.dtos.requests.WarehouseRequest;
+import org.kashcode.inventorymanagementsystem.dtos.responses.WarehouseResponse;
 import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,9 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class WarehouseServiceImplTest {
+class WarehouseServiceImplTest {
 
     @Mock
     private WarehouseRepository warehouseRepository;
@@ -39,10 +41,13 @@ public class WarehouseServiceImplTest {
     @Test
     void testCreateWarehouseSuccess() {
         WarehouseRequest request = new WarehouseRequest();
+        request.setName("Main Warehouse");
+        request.setAddress("Lagos, Nigeria");
+        request.setCapacity(100);
 
         when(warehouseRepository.save(any(Warehouse.class))).thenReturn(warehouse);
 
-        var response = warehouseService.createWarehouse(request);
+        WarehouseResponse response = warehouseService.createWarehouse(request);
 
         assertNotNull(response);
         assertEquals("Main Warehouse", response.getName());
@@ -56,6 +61,7 @@ public class WarehouseServiceImplTest {
         var responses = warehouseService.getAllWarehouses();
 
         assertEquals(1, responses.size());
+        assertEquals("Main Warehouse", responses.get(0).getName());
         verify(warehouseRepository, times(1)).findAll();
     }
 
@@ -75,5 +81,52 @@ public class WarehouseServiceImplTest {
 
         assertThrows(WarehouseNotFoundException.class, () -> warehouseService.getWarehouseById(1L));
         verify(warehouseRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testUpdateWarehouseSuccess() {
+        WarehouseRequest request = new WarehouseRequest();
+        request.setName("Updated Warehouse");
+
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        when(warehouseRepository.save(any(Warehouse.class))).thenReturn(warehouse);
+
+        warehouseService.updateWarehouse(1L, request);
+
+        assertEquals("Updated Warehouse", warehouse.getName());
+        verify(warehouseRepository, times(1)).findById(1L);
+        verify(warehouseRepository, times(1)).save(warehouse);
+    }
+
+    @Test
+    void testUpdateWarehouseNotFoundThrowsException() {
+        WarehouseRequest request = new WarehouseRequest();
+        request.setName("Updated Warehouse");
+
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(WarehouseNotFoundException.class, () -> warehouseService.updateWarehouse(1L, request));
+        verify(warehouseRepository, times(1)).findById(1L);
+        verify(warehouseRepository, never()).save(any(Warehouse.class));
+    }
+
+    @Test
+    void testDeleteWarehouseSuccess() {
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        doNothing().when(warehouseRepository).delete(warehouse);
+
+        warehouseService.deleteWarehouse(1L);
+
+        verify(warehouseRepository, times(1)).findById(1L);
+        verify(warehouseRepository, times(1)).delete(warehouse);
+    }
+
+    @Test
+    void testDeleteWarehouseNotFoundThrowsException() {
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(WarehouseNotFoundException.class, () -> warehouseService.deleteWarehouse(1L));
+        verify(warehouseRepository, times(1)).findById(1L);
+        verify(warehouseRepository, never()).delete(any(Warehouse.class));
     }
 }
