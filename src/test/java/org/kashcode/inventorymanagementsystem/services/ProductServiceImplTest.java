@@ -13,6 +13,7 @@ import org.kashcode.inventorymanagementsystem.data.repositories.SupplierReposito
 import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
 import org.kashcode.inventorymanagementsystem.dtos.requests.ProductRequest;
 import org.kashcode.inventorymanagementsystem.dtos.responses.ProductResponse;
+import org.kashcode.inventorymanagementsystem.exceptions.ProductNotFoundException;
 import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
 import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
 import org.mockito.InjectMocks;
@@ -85,7 +86,10 @@ class ProductServiceImplTest {
         productRequest.setDescription("High-end laptop");
         productRequest.setQuantityInStock(3);
         productRequest.setReOrderThreshold(5);
+        productRequest.setWarehouseId(1L);
 
+        Warehouse warehouse = new Warehouse();
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         ProductResponse response = productService.createProduct(productRequest);
@@ -168,5 +172,28 @@ class ProductServiceImplTest {
 
         verify(productRepository, never()).save(any());
         verify(purchaseOrderRepository, never()).save(any());
+    }
+
+
+
+    @Test
+    void deleteProduct_ShouldDeleteProduct_WhenProductExists() {
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        productService.deleteProduct(1L);
+
+        verify(productRepository, times(1)).findById(1L);
+        verify(productRepository, times(1)).delete(product);
+    }
+
+    @Test
+    void deleteProduct_ShouldThrowException_WhenProductDoesNotExist() {
+        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.deleteProduct(1L))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Product not found");
+
+        verify(productRepository, never()).delete(any());
     }
 }
