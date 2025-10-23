@@ -10,6 +10,7 @@ import org.kashcode.inventorymanagementsystem.data.repositories.ProductRepositor
 import org.kashcode.inventorymanagementsystem.data.repositories.PurchaseOrderRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.SupplierRepository;
 import org.kashcode.inventorymanagementsystem.data.repositories.WarehouseRepository;
+import org.kashcode.inventorymanagementsystem.exceptions.ProductNotFoundException;
 import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
 import org.kashcode.inventorymanagementsystem.exceptions.WarehouseNotFoundException;
 import org.kashcode.inventorymanagementsystem.utils.ProductMapper;
@@ -84,5 +85,11 @@ public class ProductServiceImpl implements ProductService {
             productRepository.save(product);
             checkAndReorder(product);
         });
+    }
+
+    @Override
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        productRepository.delete(product);
     }
 }
