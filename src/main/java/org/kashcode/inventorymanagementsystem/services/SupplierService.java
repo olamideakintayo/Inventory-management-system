@@ -9,4 +9,8 @@ public interface SupplierService {
     SupplierResponse createSupplier(SupplierRequest request);
     List<SupplierResponse> getAllSuppliers();
     SupplierResponse getSupplierById(Long supplierId);
+
+    void deleteSupplier(Long supplierId);
+
+    void updateSupplier(Long supplierId, SupplierRequest request);
 }
