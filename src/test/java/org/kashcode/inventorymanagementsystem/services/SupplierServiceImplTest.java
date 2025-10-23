@@ -16,7 +16,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class SupplierServiceImplTest {
+class SupplierServiceImplTest {
 
     @Mock
     private SupplierRepository supplierRepository;
@@ -38,6 +38,8 @@ public class SupplierServiceImplTest {
     @Test
     void testCreateSupplierSuccess() {
         SupplierRequest request = new SupplierRequest();
+        request.setName("Global Supplies Ltd");
+        request.setContactInformation("globalsupplies@example.com");
 
         when(supplierRepository.save(any(Supplier.class))).thenReturn(supplier);
 
@@ -74,5 +76,58 @@ public class SupplierServiceImplTest {
 
         assertThrows(SupplierNotFoundException.class, () -> supplierService.getSupplierById(1L));
         verify(supplierRepository, times(1)).findById(1L);
+    }
+
+
+
+    @Test
+    void testUpdateSupplierSuccess() {
+        SupplierRequest request = new SupplierRequest();
+        request.setName("Updated Supplier Ltd");
+        request.setContactInformation("updated@example.com");
+
+        when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
+        when(supplierRepository.save(any(Supplier.class))).thenReturn(supplier);
+
+        supplierService.updateSupplier(1L, request);
+
+        assertEquals("Updated Supplier Ltd", supplier.getName());
+        assertEquals("updated@example.com", supplier.getContactInformation());
+        verify(supplierRepository, times(1)).findById(1L);
+        verify(supplierRepository, times(1)).save(supplier);
+    }
+
+    @Test
+    void testUpdateSupplierNotFoundThrowsException() {
+        SupplierRequest request = new SupplierRequest();
+        request.setName("Updated Supplier Ltd");
+        request.setContactInformation("updated@example.com");
+
+        when(supplierRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(SupplierNotFoundException.class, () -> supplierService.updateSupplier(1L, request));
+        verify(supplierRepository, times(1)).findById(1L);
+        verify(supplierRepository, never()).save(any());
+    }
+
+
+
+    @Test
+    void testDeleteSupplierSuccess() {
+        when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
+
+        supplierService.deleteSupplier(1L);
+
+        verify(supplierRepository, times(1)).findById(1L);
+        verify(supplierRepository, times(1)).delete(supplier);
+    }
+
+    @Test
+    void testDeleteSupplierNotFoundThrowsException() {
+        when(supplierRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(SupplierNotFoundException.class, () -> supplierService.deleteSupplier(1L));
+        verify(supplierRepository, times(1)).findById(1L);
+        verify(supplierRepository, never()).delete(any());
     }
 }
