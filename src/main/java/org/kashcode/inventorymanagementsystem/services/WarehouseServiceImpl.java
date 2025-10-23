@@ -43,12 +43,18 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void updateWarehouse(Long warehouseId, WarehouseRequest request) {
-        Warehouse warehouse = warehouseRepository.findById(warehouseId)
+    public WarehouseResponse updateWarehouse(Long warehouseId, WarehouseRequest request) {
+        Warehouse existingWarehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
-        warehouse.setName(request.getName());
-        warehouseRepository.save(warehouse);
+
+        Warehouse updatedWarehouse = WarehouseMapper.toWarehouseEntity(request);
+        updatedWarehouse.setWarehouseId(existingWarehouse.getWarehouseId());
+        updatedWarehouse.setProducts(existingWarehouse.getProducts());
+
+        Warehouse savedWarehouse = warehouseRepository.save(updatedWarehouse);
+        return WarehouseMapper.toWarehouseResponse(savedWarehouse);
     }
+
 
     @Override
     public void deleteWarehouse(Long warehouseId) {

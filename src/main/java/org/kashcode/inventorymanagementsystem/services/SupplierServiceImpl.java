@@ -43,13 +43,19 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public void updateSupplier(Long supplierId, SupplierRequest request) {
-        Supplier supplier = supplierRepository.findById(supplierId)
+    public SupplierResponse updateSupplier(Long supplierId, SupplierRequest request) {
+        Supplier existingSupplier = supplierRepository.findById(supplierId)
                 .orElseThrow(() -> new SupplierNotFoundException("Supplier not found"));
-        supplier.setName(request.getName());
-        supplier.setContactInformation(request.getContactInformation());
-        supplierRepository.save(supplier);
+
+        Supplier updatedSupplier = SupplierMapper.toSupplierEntity(request);
+        updatedSupplier.setSupplierId(existingSupplier.getSupplierId());
+
+        Supplier savedSupplier = supplierRepository.save(updatedSupplier);
+
+        return SupplierMapper.toSupplierResponse(savedSupplier);
     }
+
+
 
     @Override
     public void deleteSupplier(Long supplierId) {

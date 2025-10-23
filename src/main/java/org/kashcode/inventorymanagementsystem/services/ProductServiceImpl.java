@@ -79,13 +79,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateStock(Long productId, int newQuantity) {
-        productRepository.findById(productId).ifPresent(product -> {
-            product.setQuantityInStock(newQuantity);
-            productRepository.save(product);
-            checkAndReorder(product);
-        });
+    public ProductResponse updateProduct(Long productId, ProductRequest request) {
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        Product updatedProduct = ProductMapper.toProductEntity(request);
+        updatedProduct.setProductId(existingProduct.getProductId());
+
+        updatedProduct = productRepository.save(updatedProduct);
+        return ProductMapper.toProductResponse(updatedProduct);
     }
+
+
 
     @Override
     public void deleteProduct(Long productId) {

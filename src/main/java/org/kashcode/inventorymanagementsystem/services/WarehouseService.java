@@ -11,5 +11,5 @@ public interface WarehouseService {
     WarehouseResponse getWarehouseById(Long warehouseId);
 
     void deleteWarehouse(Long warehouseId);
-    void updateWarehouse(Long warehouseId, WarehouseRequest request);
+    WarehouseResponse updateWarehouse(Long warehouseId, WarehouseRequest request);
 }

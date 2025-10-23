@@ -12,7 +12,7 @@ public interface ProductService {
 
     void checkAndReorder(Product product);
 
-    void updateStock(Long productId, int newQuantity);
+    ProductResponse updateProduct(Long productId, ProductRequest request);
 
     List<ProductResponse> getAllProducts();
 
