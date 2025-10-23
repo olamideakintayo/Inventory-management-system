@@ -9,4 +9,7 @@ public interface WarehouseService {
     WarehouseResponse createWarehouse(WarehouseRequest request);
     List<WarehouseResponse> getAllWarehouses();
     WarehouseResponse getWarehouseById(Long warehouseId);
+
+    void deleteWarehouse(Long warehouseId);
+    void updateWarehouse(Long warehouseId, WarehouseRequest request);
 }
