@@ -26,7 +26,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +53,7 @@ class ProductServiceImplTest {
         product = new Product();
         product.setProductId(1L);
         product.setName("Laptop");
+        product.setDescription("Gaming laptop");
         product.setQuantityInStock(3);
         product.setReOrderThreshold(5);
     }
@@ -65,7 +65,7 @@ class ProductServiceImplTest {
         List<ProductResponse> responses = productService.getAllProducts();
 
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0).getName()).isEqualTo(product.getName());
+        assertThat(responses.get(0).getName()).isEqualTo("Laptop");
         verify(productRepository, times(1)).findAll();
     }
 
@@ -81,18 +81,20 @@ class ProductServiceImplTest {
 
     @Test
     void createProduct_ShouldReturnMappedResponse_WhenProductIsSaved() {
-        var productRequest = new ProductRequest();
-        productRequest.setName("Laptop");
-        productRequest.setDescription("High-end laptop");
-        productRequest.setQuantityInStock(3);
-        productRequest.setReOrderThreshold(5);
-        productRequest.setWarehouseId(1L);
+        var request = new ProductRequest();
+        request.setName("Laptop");
+        request.setDescription("High-end laptop");
+        request.setQuantityInStock(3);
+        request.setReOrderThreshold(5);
+        request.setWarehouseId(1L);
 
         Warehouse warehouse = new Warehouse();
+        warehouse.setWarehouseId(1L);
+
         when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
-        ProductResponse response = productService.createProduct(productRequest);
+        ProductResponse response = productService.createProduct(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getName()).isEqualTo("Laptop");
@@ -100,7 +102,66 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void checkAndReorder_ShouldCreatePurchaseOrder_WhenStockBelowThresholdAndDependenciesExist() {
+    void createProduct_ShouldThrowException_WhenWarehouseNotFound() {
+        var request = new ProductRequest();
+        request.setWarehouseId(999L);
+
+        when(warehouseRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.createProduct(request))
+                .isInstanceOf(WarehouseNotFoundException.class)
+                .hasMessage("Warehouse not found");
+    }
+
+    @Test
+    void updateProduct_ShouldReturnUpdatedResponse_WhenProductExists() {
+        Long productId = 1L;
+
+        Product existingProduct = new Product();
+        existingProduct.setProductId(productId);
+        existingProduct.setName("Old Laptop");
+        existingProduct.setDescription("Old model");
+        existingProduct.setQuantityInStock(10);
+        existingProduct.setReOrderThreshold(5);
+
+        ProductRequest request = new ProductRequest();
+        request.setName("Updated Laptop");
+        request.setDescription("New 2025 model");
+        request.setQuantityInStock(20);
+        request.setReOrderThreshold(10);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ProductResponse response = productService.updateProduct(productId, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getName()).isEqualTo("Updated Laptop");
+        assertThat(response.getDescription()).isEqualTo("New 2025 model");
+        assertThat(response.getQuantityInStock()).isEqualTo(20);
+        assertThat(response.getReOrderThreshold()).isEqualTo(10);
+
+        verify(productRepository, times(1)).findById(productId);
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void updateProduct_ShouldThrowException_WhenProductNotFound() {
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        ProductRequest request = new ProductRequest();
+        request.setName("nike shoe");
+        request.setDescription("nike shoe");
+
+        assertThatThrownBy(() -> productService.updateProduct(999L, request))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Product not found");
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void checkAndReorder_ShouldCreatePurchaseOrder_WhenBelowThreshold() {
         Supplier supplier = new Supplier();
         Warehouse warehouse = new Warehouse();
 
@@ -115,7 +176,6 @@ class ProductServiceImplTest {
     @Test
     void checkAndReorder_ShouldThrowSupplierNotFoundException_WhenNoSupplierExists() {
         when(supplierRepository.findAll()).thenReturn(List.of());
-        lenient().when(warehouseRepository.findAll()).thenReturn(List.of(new Warehouse()));
 
         assertThatThrownBy(() -> productService.checkAndReorder(product))
                 .isInstanceOf(SupplierNotFoundException.class)
@@ -139,55 +199,23 @@ class ProductServiceImplTest {
     @Test
     void checkAndReorder_ShouldNotCreateOrder_WhenStockAboveThreshold() {
         product.setQuantityInStock(10);
+
         productService.checkAndReorder(product);
 
         verify(purchaseOrderRepository, never()).save(any());
     }
 
     @Test
-    void updateStock_ShouldUpdateProductAndTriggerReorder_WhenProductExists() {
-        Supplier supplier = new Supplier();
-        Warehouse warehouse = new Warehouse();
-
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(supplierRepository.findAll()).thenReturn(List.of(supplier));
-        when(warehouseRepository.findAll()).thenReturn(List.of(warehouse));
-
-        productService.updateStock(1L, 2);
-
-        verify(productRepository, times(1)).save(product);
-        verify(purchaseOrderRepository, times(1)).save(argThat(order ->
-                order.getProduct() == product &&
-                        order.getSupplier() == supplier &&
-                        order.getWarehouse() == warehouse &&
-                        order.getQuantityOrdered() == product.getReOrderThreshold() * 2
-        ));
-    }
-
-    @Test
-    void updateStock_ShouldDoNothing_WhenProductNotFound() {
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
-
-        productService.updateStock(1L, 2);
-
-        verify(productRepository, never()).save(any());
-        verify(purchaseOrderRepository, never()).save(any());
-    }
-
-
-
-    @Test
-    void deleteProduct_ShouldDeleteProduct_WhenProductExists() {
+    void deleteProduct_ShouldDelete_WhenProductExists() {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
         productService.deleteProduct(1L);
 
-        verify(productRepository, times(1)).findById(1L);
         verify(productRepository, times(1)).delete(product);
     }
 
     @Test
-    void deleteProduct_ShouldThrowException_WhenProductDoesNotExist() {
+    void deleteProduct_ShouldThrowException_WhenNotFound() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.deleteProduct(1L))

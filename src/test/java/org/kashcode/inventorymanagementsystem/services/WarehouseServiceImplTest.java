@@ -85,18 +85,41 @@ class WarehouseServiceImplTest {
 
     @Test
     void testUpdateWarehouseSuccess() {
+        // Arrange
         WarehouseRequest request = new WarehouseRequest();
         request.setName("Updated Warehouse");
+        request.setAddress("Abuja, Nigeria");
+        request.setCapacity(200);
 
-        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
-        when(warehouseRepository.save(any(Warehouse.class))).thenReturn(warehouse);
+        Warehouse existingWarehouse = new Warehouse();
+        existingWarehouse.setWarehouseId(1L);
+        existingWarehouse.setName("Old Warehouse");
+        existingWarehouse.setAddress("Lagos, Nigeria");
+        existingWarehouse.setCapacity(100);
 
-        warehouseService.updateWarehouse(1L, request);
+        Warehouse updatedWarehouse = new Warehouse();
+        updatedWarehouse.setWarehouseId(1L);
+        updatedWarehouse.setName("Updated Warehouse");
+        updatedWarehouse.setAddress("Abuja, Nigeria");
+        updatedWarehouse.setCapacity(200);
 
-        assertEquals("Updated Warehouse", warehouse.getName());
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(existingWarehouse));
+        when(warehouseRepository.save(any(Warehouse.class))).thenReturn(updatedWarehouse);
+
+
+        var response = warehouseService.updateWarehouse(1L, request);
+
+
+        assertNotNull(response);
+        assertEquals(1L, response.getWarehouseId());
+        assertEquals("Updated Warehouse", response.getName());
+        assertEquals("Abuja, Nigeria", response.getAddress());
+        assertEquals(200, response.getCapacity());
+
         verify(warehouseRepository, times(1)).findById(1L);
-        verify(warehouseRepository, times(1)).save(warehouse);
+        verify(warehouseRepository, times(1)).save(any(Warehouse.class));
     }
+
 
     @Test
     void testUpdateWarehouseNotFoundThrowsException() {

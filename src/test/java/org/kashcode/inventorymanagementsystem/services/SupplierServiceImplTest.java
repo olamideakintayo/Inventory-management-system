@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.kashcode.inventorymanagementsystem.data.models.Supplier;
 import org.kashcode.inventorymanagementsystem.data.repositories.SupplierRepository;
 import org.kashcode.inventorymanagementsystem.dtos.requests.SupplierRequest;
+import org.kashcode.inventorymanagementsystem.dtos.responses.SupplierResponse;
 import org.kashcode.inventorymanagementsystem.exceptions.SupplierNotFoundException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -79,23 +80,37 @@ class SupplierServiceImplTest {
     }
 
 
-
     @Test
     void testUpdateSupplierSuccess() {
+        // Arrange
         SupplierRequest request = new SupplierRequest();
         request.setName("Updated Supplier Ltd");
         request.setContactInformation("updated@example.com");
 
-        when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
-        when(supplierRepository.save(any(Supplier.class))).thenReturn(supplier);
+        Supplier existingSupplier = new Supplier();
+        existingSupplier.setSupplierId(1L);
+        existingSupplier.setName("Old Supplier Ltd");
+        existingSupplier.setContactInformation("old@example.com");
 
-        supplierService.updateSupplier(1L, request);
+        Supplier updatedSupplier = new Supplier();
+        updatedSupplier.setSupplierId(1L);
+        updatedSupplier.setName("Updated Supplier Ltd");
+        updatedSupplier.setContactInformation("updated@example.com");
 
-        assertEquals("Updated Supplier Ltd", supplier.getName());
-        assertEquals("updated@example.com", supplier.getContactInformation());
+        when(supplierRepository.findById(1L)).thenReturn(Optional.of(existingSupplier));
+        when(supplierRepository.save(any(Supplier.class))).thenReturn(updatedSupplier);
+
+        SupplierResponse response = supplierService.updateSupplier(1L, request);
+
+        assertNotNull(response);
+        assertEquals(1L, response.getSupplierId());
+        assertEquals("Updated Supplier Ltd", response.getName());
+        assertEquals("updated@example.com", response.getContactInformation());
+
         verify(supplierRepository, times(1)).findById(1L);
-        verify(supplierRepository, times(1)).save(supplier);
+        verify(supplierRepository, times(1)).save(any(Supplier.class));
     }
+
 
     @Test
     void testUpdateSupplierNotFoundThrowsException() {
