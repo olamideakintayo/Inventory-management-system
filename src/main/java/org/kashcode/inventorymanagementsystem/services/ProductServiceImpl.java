@@ -89,6 +89,14 @@ public class ProductServiceImpl implements ProductService {
         return ProductMapper.toProductResponse(updatedProduct);
     }
 
+    public ProductResponse getProductById(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID " + productId));
+
+        return ProductMapper.toProductResponse(product);
+    }
+
+
 
 
     @Override

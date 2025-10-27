@@ -44,12 +44,18 @@ public class ProductController {
         return ResponseEntity.ok("Product deleted successfully");
     }
 
-
     @PostMapping("/check-reorder/{productId}")
     public ResponseEntity<String> checkAndReorder(@PathVariable Long productId) {
+        ProductResponse response = productService.getProductById(productId);
+
         Product product = new Product();
         product.setProductId(productId);
+        product.setName(response.getName());
+        product.setQuantityInStock(response.getQuantityInStock());
+        product.setReOrderThreshold(response.getReOrderThreshold());
+
         productService.checkAndReorder(product);
-        return ResponseEntity.ok("Reorder check completed (if threshold reached, order created)");
+
+        return ResponseEntity.ok("Reorder check completed for product ID " + productId);
     }
-}
+    }
