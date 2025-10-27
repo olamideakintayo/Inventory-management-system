@@ -50,4 +50,6 @@ public class SupplierController {
         supplierService.deleteSupplier(supplierId);
         return ResponseEntity.ok("Supplier deleted successfully");
     }
+
+
 }

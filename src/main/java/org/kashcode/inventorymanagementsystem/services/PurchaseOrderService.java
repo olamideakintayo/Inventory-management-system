@@ -14,5 +14,7 @@ public interface PurchaseOrderService {
 
     void validateWarehouseCapacity(Warehouse warehouse, int quantityToAdd);
 
+    void deleteOrder(Long orderId);
+
 
 }

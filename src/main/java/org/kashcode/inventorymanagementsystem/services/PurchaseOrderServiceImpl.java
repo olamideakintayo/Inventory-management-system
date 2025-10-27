@@ -76,4 +76,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     }
 
+    @Override
+    public void deleteOrder(Long orderId) {
+        PurchaseOrder order = purchaseOrderRepository.findById(orderId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        purchaseOrderRepository.delete(order);
+    }
+
 }

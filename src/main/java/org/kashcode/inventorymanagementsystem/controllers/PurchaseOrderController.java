@@ -30,4 +30,10 @@ public class PurchaseOrderController {
     public ResponseEntity<List<PurchaseOrderResponse>> getAllOrders() {
         return ResponseEntity.ok(purchaseOrderService.getAllOrders());
     }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId) {
+        purchaseOrderService.deleteOrder(orderId);
+        return ResponseEntity.ok("Purchase order deleted successfully");
+    }
 }
