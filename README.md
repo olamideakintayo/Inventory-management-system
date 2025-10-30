@@ -1,6 +1,6 @@
 # Inventory Management System
 
-A **Spring Boot 3.5.6** based backend application designed to manage and streamline inventory operations.  
+A **Spring Boot** based backend application designed to manage and streamline inventory operations.  
 This system enables efficient management of **Products**, **Suppliers**, **Warehouses**, and **Purchase Orders**, with seamless database integration and cloud-ready deployment.
 
 ---
@@ -106,13 +106,13 @@ Visit [http://localhost:8080](http://localhost:8080)
 1. Connect the GitHub repository to Render.com  
 2. Add Environment Variables under **Render → Environment → Add Variables**  
 3. Deploy the service and monitor logs to confirm connection to Aiven MySQL  
-4. Application runs on `https://<your-service-name>.onrender.com`
+4. Application runs on `https://inventory-management-system-mmo5.onrender.com`
 
 ---
 
 ## 📫 API Endpoints
 
-Base URL: `https://<your-service-name>.onrender.com/api`
+Base URL: `https://inventory-management-system-mmo5.onrender.com/api`
 
 ### **Warehouse APIs**
 | Method | Endpoint | Description |
@@ -131,6 +131,7 @@ Base URL: `https://<your-service-name>.onrender.com/api`
 | DELETE | `/suppliers/{id}` | Delete supplier |
 
 ### **Product APIs**
+
 | Method | Endpoint | Description |
 |--------|-----------|-------------|
 | POST | `/products` | Create new product |
@@ -140,6 +141,7 @@ Base URL: `https://<your-service-name>.onrender.com/api`
 | DELETE | `/products/{id}` | Delete product |
 
 ### **Purchase Order APIs**
+
 | Method | Endpoint | Description |
 |--------|-----------|-------------|
 | POST | `/purchase-orders` | Create new purchase order |
@@ -148,14 +150,6 @@ Base URL: `https://<your-service-name>.onrender.com/api`
 
 ---
 
-## 🧠 Best Practices
-
-- Use **SSL mode REQUIRED** when connecting to Aiven databases.  
-- Never hardcode credentials, always use **environment variables**.  
-- Logs and exceptions are structured for production readability.  
-- The system is **cloud‑ready** and can scale horizontally.
-
----
 
 ## 📜 License
 
