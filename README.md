@@ -151,7 +151,7 @@ Base URL: `https://<your-service-name>.onrender.com/api`
 ## 🧠 Best Practices
 
 - Use **SSL mode REQUIRED** when connecting to Aiven databases.  
-- Never hardcode credentials — always use **environment variables**.  
+- Never hardcode credentials, always use **environment variables**.  
 - Logs and exceptions are structured for production readability.  
 - The system is **cloud‑ready** and can scale horizontally.
 
@@ -159,7 +159,7 @@ Base URL: `https://<your-service-name>.onrender.com/api`
 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](./LICENSE).
 
 ---
 
@@ -167,7 +167,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 - Add authentication and role-based access control  
 - Integrate notification for low-stock alerts  
-- Build a React or Angular frontend for the API  
+- Build a React frontend for the API  
 - Implement audit logging and analytics dashboards
 
 ---
