@@ -88,12 +88,12 @@ server.port=${PORT:8080}
 
 ### Build Image
 ```bash
-docker build -t inventory-backend .
+docker build -t inventorymanagementsystem .
 ```
 
 ### Run Container
 ```bash
-docker run -d -p 8080:8080   -e DB_USER=<your_db_user>   -e DB_PASSWORD=<your_db_password>   -e DB_HOST=<your_db_host>   -e DB_NAME=<your_db_name>   inventory-backend
+docker run -d -p 8080:8080   -e DB_USER=<your_db_user>   -e DB_PASSWORD=<your_db_password>   -e DB_HOST=<your_db_host>   -e DB_NAME=<your_db_name>   inventorymanagementsystem
 ```
 
 ### Verify
