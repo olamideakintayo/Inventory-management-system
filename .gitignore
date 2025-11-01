@@ -35,3 +35,4 @@ build/
 
 # Ignore secret credentials
 src/main/resources/secret.properties
+src/main/resources/application-local.properties
