@@ -58,4 +58,10 @@ public class ProductController {
 
         return ResponseEntity.ok("Reorder check completed for product ID " + productId);
     }
+
+    @GetMapping
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long productId) {
+        ProductResponse response = productService.getProductById(productId);
+        return ResponseEntity.ok(response);
+    }
     }
